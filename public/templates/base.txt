@@ -1,0 +1,67 @@
+esphome:
+  name: {{ name }}
+  friendly_name: {{ friendly_name }}
+  {% if wakeonlan -%}
+  on_boot:
+    priority: 800
+    then:
+      - wait_until: 
+          wifi.connected:
+      - while:
+          condition:
+            not:
+              api.connected:
+          then:
+            - button.press: "start_server"
+            - delay: 10ms
+  {%- endif %}
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  reboot_timeout: 0s
+  encryption:
+    key: {{ encryption_key }}
+
+ota:
+  password: {{ ota_password }}
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 0s
+
+  {% if manual_ip %}
+  manual_ip:
+    static_ip: {{ static_ip }}
+    gateway: {{ gateway }}
+    subnet: {{ subnet }}
+  {% endif %}
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "{{ friendly_name }} Fallback Hotspot"
+    password: {{ ap_password }}
+
+captive_portal:
+
+button:
+  # Reset
+  - platform: restart
+    id: "{{ friendly_name }}_restart"
+    name: "{{ friendly_name }} Restart"
+    icon: "mdi:restart"
+  
+  # HA Server WOL
+  - platform: wake_on_lan
+    id: "start_server"
+    name: "Start the Server"
+    icon: "mdi:power"
+    target_mac_address: {{ target_mac_address }}

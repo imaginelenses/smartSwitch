@@ -1,0 +1,99 @@
+#root {
+  width: 90vw;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form {
+  font-size: 1.8rem;
+}
+
+input {
+  height: 3rem;
+  padding: 2rem 1rem;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.5rem;
+  border-color: #495057;
+  background: inherit;
+  box-sizing: border-box;
+}
+
+.formItem {
+  --label-length: 25%;
+  --gap: 0.5em;
+  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap);
+  padding: 0.2em;
+
+  label {
+    width: var(--label-length);
+    text-align: left;
+  }
+
+  input {
+    flex-grow: 1;
+  }
+}
+
+.checkbox {
+  margin-left: calc(var(--label-length) + var(--gap));
+  
+  label {
+    width: unset;
+  }
+  
+  input {
+    flex-grow: 0;
+    height: 1.8rem;
+    aspect-ratio: 1;
+  }
+}
+
+.partitionedInputWrapper {
+  display: flex;
+  gap: 0.3em;
+  width: calc(100% - var(--label-length));
+  align-items: center;
+  user-select: none;
+  overflow-x: auto;
+
+  input {
+    text-align: center;
+  }
+}
+
+pre {
+  padding: 0.7em 1em;
+  overflow: auto;
+}
+
+@media (max-width: 650px) {
+  .formItem {
+    flex-direction: column;
+    align-items: flex-start;
+    
+    label, input {
+      width: 100%;
+      flex-grow: 1;
+    }
+  }
+  
+  .checkbox {
+    flex-direction: row;
+    margin-left: unset;
+
+    label, input {
+      width: unset;
+      flex-grow: 0;
+    }
+  }
+
+  .partitionedInputWrapper {
+    width: 100%;
+  }
+}
