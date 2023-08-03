@@ -1,2 +1,2 @@
 # smartSwitch
-ESPHome based smart wall switch.
+Tool to configure ESPHome based smart wall switch.
