@@ -1,11 +1,29 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family:
+    system-ui,
+    "Segoe UI",
+    "Noto Sans",
+    "Liberation Sans",
+    Arial,
+    sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-size: 62.5%;
   font-weight: 400;
+  
+  --light: rgb(223, 220, 220);
+  --light-fill: rgb(245, 241, 241);
+  --dark: #242424;
+  --dark-fill: #1a1a1a;
+  --dark-stroke: #495057;
+  --accent1: #646cff;
+  --accent-hover-dark: #535bf2;
+  --accent-hover-light: #535bf2;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--light);
+  background-color: var(--dark);
+
+  --border-radius: 0.35em;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,52 +33,78 @@
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
+  color: var(--accent1);
   text-decoration: inherit;
 }
+
 a:hover {
-  color: #535bf2;
+  color: var(--accent-hover-dark);
+  text-decoration: underline;
+  text-decoration-skip-ink: all;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
   font-size: 2rem;
+  --clr: #111111;
+  --background: var(--dark);
+  --width: 0.5rem;
+  --circle: 0.8rem;
+  --size: 5rem;
+  background: 
+    radial-gradient(circle, transparent var(--circle), var(--background) var(--circle)),
+    linear-gradient(var(--clr) var(--width), transparent var(--width)),
+    linear-gradient(90deg, var(--clr) var(--width), transparent var(--width));
+  background-size: var(--size) var(--size);
+  background-position: 5.25rem 5.25rem, 2.5rem 2.5rem, 2.5rem 2.5rem;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   border: 1px solid transparent;
   margin-block: 0.5em;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  box-shadow: 0 1rem 3rem rgba(black, .175);
+  background-color: var(--dark);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 250ms;
 }
-button:hover {
-  border-color: #646cff;
+
+a:hover, button:hover, input:hover, select:hover {
+  border-color: var(--accent-hover-dark) !important;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
+@media (max-width: 650px) {
+  body {
+    background: var(--dark-fill);
+  }
+  
+  @media (prefers-color-scheme: light) {
+    body {
+      background: var(--light-fill);
+    }
+  }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--dark);
+    background-color: var(--light);
   }
-  a:hover {
-    color: #747bff;
+
+  body {
+    --clr: var(--dark-stroke);
+    --background: var(--light);
   }
+
+  a:hover, button:hover, input:hover, select:hover {
+    border-color: var(--accent-hover-dark) !important;
+  }
+
   button {
-    background-color: #f9f9f9;
+    color: var(--light);
   }
 }

@@ -1,6 +1,8 @@
 esphome:
-  name: {{ name }}
-  friendly_name: {{ friendly_name }}
+  name: "{{ name }}"
+  {% if friendly_name -%}
+  friendly_name: "{{ friendly_name }}"
+  {%- endif %}
   {% if wakeonlan -%}
   on_boot:
     priority: 800
@@ -28,10 +30,10 @@ logger:
 api:
   reboot_timeout: 0s
   encryption:
-    key: {{ encryption_key }}
+    key: "{{ encryption_key }}"
 
 ota:
-  password: {{ ota_password }}
+  password: "{{ ota_password }}"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -48,20 +50,76 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "{{ friendly_name }} Fallback Hotspot"
-    password: {{ ap_password }}
+    password: "{{ ap_password }}"
 
 captive_portal:
 
 button:
   # Reset
   - platform: restart
-    id: "{{ friendly_name }}_restart"
+    id: "{{ name }}_restart"
     name: "{{ friendly_name }} Restart"
     icon: "mdi:restart"
   
+  {% if wakeonlan -%}
   # HA Server WOL
   - platform: wake_on_lan
     id: "start_server"
     name: "Start the Server"
     icon: "mdi:power"
     target_mac_address: {{ target_mac_address }}
+  {%- endif %}
+
+{% if switches.length -%}
+output:
+  {% for switch in switches -%}
+  - platform: gpio
+    id: {{ switch.output_id }}
+    pin: {{ switch.output_pin }}
+    inverted: True
+  {% endfor %}
+
+light:
+  {% for switch in switches -%}
+  {% if switch.type === 'light' -%}
+  - platform: binary
+    id: {{ switch.id }}
+    name: {{ switch.name }}
+    output: {{ switch.output_id }}
+    restore_mode: RESTORE_DEFAULT_OFF
+  {%- endif %}
+  {% endfor %}
+
+fan:
+  {% for switch in switches -%}
+  {% if switch.type === 'fan' -%}
+  - platform: binary
+    id: {{ switch.id }}
+    name: {{ switch.name }}
+    output: {{ switch.output_id }}
+    restore_mode: RESTORE_DEFAULT_OFF
+  {%- endif %}
+  {% endfor %}
+
+binary_sensor:
+  {% for switch in switches -%}
+  - platform: gpio
+    name: {{ switch.sensor_name }}
+    id: {{ switch.sensor_id }}
+    pin:
+      number: {{ switch.sensor_pin }}
+      mode:
+        input: True
+        pulldown: True
+    filters:
+      - delayed_off: 50ms
+    on_press:
+      then:
+        - {{ switch.type }}.toggle: {{ switch.id }}
+    {% if switch.toggle === false -%}
+    on_release:
+      then:
+        - {{ switch.type }}.toggle: {{ switch.id }}  
+    {%- endif %}
+  {% endfor %}
+{%- endif %}

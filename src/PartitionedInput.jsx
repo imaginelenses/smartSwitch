@@ -19,9 +19,26 @@ class PartitionedInput extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    let value = ''
+    let i
+    let update = false
+    for (i = 0; i < this.props.fields; i++) {
+      let field = this.state[`field_${i}`]
+      if (prevState[`field_${i}`] !== field) {
+        update = true
+      }
+      value = value + field + (i < this.props.fields - 1 ? this.props.delimiter : '')
+    }
+
+    if (update) {
+      this.props.handleChange(value)
+    }
+  }
+
   render() {
     return (
-      <div className={this.props.cls}>
+      <div className={this.props.cls} title={this.props.title}>
         <label htmlFor=".partitionedInputWrapper">{this.props.label}</label>
         <div className="partitionedInputWrapper">
           {[...Array(this.props.fields)].map((_, i) => 
@@ -32,16 +49,15 @@ class PartitionedInput extends Component {
               onChange={(e) => this.handleChange(e, i)}
               onKeyDown={(e) => this.handleKeyDown(e, i)}
               onPaste={(e) => this.handlePaste(e, i)}
-              size={this.props.length}
-              minLength={this.props.length}
-              maxLength={this.props.length}
+              size={this.props.maxLength}
+              minLength={this.props.minLength}
+              maxLength={this.props.maxLength}
               placeholder={this.placeholders ? this.placeholders[i] : ""}
-              pattern={this.props.pattern}
-              title={this.props.title}
+              pattern={`${this.props.pattern}{${this.props.minLength},${this.props.maxLength}}`}
               autoFocus={i === 0 && this.props.autoFocus}
               disabled={!(i === 0 || this.state[`field_${i - 1}`])}
               required 
-              style={{ width: `${this.props.length}.5em` }}
+              style={{ width: `${this.props.maxLength}.5em` }}
               />
             {i < this.props.fields - 1 ? <strong>{this.props.delimiter}</strong> : ""}
           </Fragment>
@@ -58,7 +74,9 @@ class PartitionedInput extends Component {
 
     let valid = true;
     [...value].forEach((letter) => { 
-      valid = letter.match(this.props.pattern)
+      if (!letter.match(this.props.pattern)) {
+        valid = false
+      }
     })
     
     return valid
@@ -66,46 +84,31 @@ class PartitionedInput extends Component {
 
   handleChange = (event, index) => {
     let value = event.target.value
-    if (!this.validate(value)) {
+    if (value !== '' && !this.validate(value)) {
       return
     }
 
     if (index === this.props.fields - 1 && 
-      value.length > this.props.length) {
+      value.length > this.props.maxLength) {
       return
     }
 
     this.setState({[`field_${index}`] : value})
     
-    if (value.length === this.props.length) {
+    if (value.length === this.props.maxLength) {
       let next = index + 1
       if (next < this.props.fields) {
         this[`field_${next}`].focus()
       }
     }
-
   }
 
   handleKeyDown = (event, index) => {
-    if (event.key !== "Backspace") {
+    if (event.key !== "Backspace" || event.target.value || index <= 0) {
       return
     }
 
-    event.preventDefault()
-
-    if (event.target.value) {
-      this.setState((state) => {
-        let temp =  state[`field_${index}`].split("")
-        temp.pop()
-        temp = temp.join("")
-        return {[`field_${index}`] : temp}
-      })
-      return
-    }
-
-    if (index > 0) {
-      this[`field_${index - 1}`].focus()
-    }
+    this[`field_${index - 1}`].focus()
   }
 
   handlePaste = (event, index) => {
