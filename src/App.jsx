@@ -273,7 +273,7 @@ class App extends Component {
           </a>
           <div>
             ©&nbsp;{(new Date).getFullYear()}&nbsp;
-            <a href="imaginelenses.com">Imaginelenses</a>
+            <a href="https://imaginelenses.com">Imaginelenses</a>
           </div>
         </footer>
       </form>
